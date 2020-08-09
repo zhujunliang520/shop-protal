@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
+
+    <link rel="icon" href="/js/shop/assets/img/favicon.ico">
+    <link rel="stylesheet" type="text/css" href="/js/shop/css/webbase.css"/>
+    <link rel="stylesheet" type="text/css" href="/js/shop/css/pages-JD-index.css"/>
+    <link rel="stylesheet" type="text/css" href="/js/shop/css/widget-jquery.autocomplete.css"/>
+    <link rel="stylesheet" type="text/css" href="/js/shop/css/widget-cartPanelView.css"/>
+    <link href="/bootstrap/css/bootstrap.min.css" rel="stylesheet"/>
+    <link href="/bootstrap/css/bootstrap.dropdown.hack.css" rel="stylesheet"/>
+
+    <script src="/bootstrap/js/jquery-3.3.1.min.js"></script>
+    <script src="/bootstrap/js/bootstrap.min.js"></script>
+    <!-- 引入boobox弹框插件的css文件和js文件 -->
+    <script src="../bootstrap/js/bootbox.min.js"></script>
+    <script src="../bootstrap/js/bootbox.locales.min.js"></script>
+
+
+    <title>商城首页</title>
+
+</head>
+<body>
+<nav class="navbar navbar-default">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+                    data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#">乐购商城</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+
+            <ul class="nav navbar-nav navbar-right">
+                <li id="loginDiv"><a href="/memberLogin.html">登录</a></li>
+                |
+                <li id="updatePasswordText" style="display: none"><a href="javascript:;"
+                                                                     onclick="updatePassword()">修改密码</a></li>
+                <li id="outDiv"><a href="/reg.html">注册</a></li>
+                <li><a href="/cart.html">购物车<span style="color: red" id="cartSumNum">(0)</span></a></li>
+            </ul>
+        </div><!-- /.navbar-collapse -->
+    </div><!-- /.container-fluid -->
+</nav>
+
+<div id="nav-bottom">
+    <!--顶部-->
+    <div class="nav-top">
+        <!--头部-->
+        <div class="header">
+            <div class="py-container">
+                <div class="yui3-g NavList">
+                    <div class="yui3-u Left all-sort">
+                        <h4>全部商品分类</h4>
+                    </div>
+                    <div class="yui3-u Center navArea">
+                        <ul class="nav">
+                            <li class="f-item">服装城</li>
+                            <li class="f-item">美妆馆</li>
+                            <li class="f-item">品优超市</li>
+                            <li class="f-item">全球购</li>
+                            <li class="f-item">闪购</li>
+                            <li class="f-item">团购</li>
+                            <li class="f-item">有趣</li>
+                        </ul>
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--列表-->
+<div class="sort">
+    <div class="py-container">
+        <div class="yui3-g SortList ">
+            <div class="yui3-u Left all-sort-list">
+                <div class="all-sort-list2" id="classifyListDiv">
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid" id="div1">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-primary">
+                <div class="panel-heading">热销商品展示列表</div>
+                <div class="panel-body" id="productDiv">
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+
+    </div>
+</div>
+
+<textarea id="productText" style="display: none">
+                     <div class="col-md-4">
+                                <div class="thumbnail" style="width: 600px;height: 300px">
+                                    <img src="###img###" alt="..." style="width: 80px">
+                                    <div class="caption">
+                                        <h3>商品名称：###productName###</h3>
+                                        <p><font color="red"><b>商品价格：###price###</b></font></p>
+                                        <p>
+                                            <a href="#" class="btn btn-primary" role="button"
+                                               onclick="buyProduct('##productId##')">购买</a>
+                                            <a href="#" class="btn btn-default" role="button">修改</a>
+                                        </p>
+                                    </div>
+                                </div>
+                     </div>
+</textarea>
+
+<!-- 修改密码模板 -->
+<div id="updatePasswordDiv" style="display:none">
+    <form id="updatePasswordForm" class="form-horizontal" style="">
+
+        <div class="form-group">
+            <label class="col-sm-2 control-label">会员名</label>
+            <div class="col-sm-8">
+                <input type="text" class="form-control" id="memberName"/>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="col-sm-2 control-label">旧密码</label>
+            <div class="col-sm-8">
+                <input type="password" class="form-control" id="password"/>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-2 control-label">新密码</label>
+            <div class="col-sm-8">
+                <input type="password" class="form-control" id="newPassword"/>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="col-sm-2 control-label">确认密码</label>
+            <div class="col-sm-8">
+                <input type="password" class="form-control" id="confirmPassword"/>
+            </div>
+        </div>
+    </form>
+</div>
+<script>
+    var updatePasswordHtml;
+    $(function () {
+        initLoginInfo();
+        initProduct();
+        updatePasswordHtml = $("#updatePasswordDiv").html();
+    });
+
+    function initLoginInfo() {
+        var token = $.cookie("token");
+        if (token) {
+            $.ajax({
+                url: 'http://localhost:8484/members/findMemberName',
+                type: 'get',
+                data: {},
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader("token", token);
+                },
+                success: function (result) {
+                    if (result.code == 200) {
+                        var member = result.data;
+                        var memberRealName = member.realName;
+                        $("#loginDiv").html("<a>欢迎<span style='color: red'>" + memberRealName + "</span>成功登录</a>");
+                        $("#outDiv").html("<a href='javascript:;' onclick='loginOut()'>退出</a>");
+                        $("#updatePasswordText").css("display", "");
+                    }
+                },
+                error: function (result) {
+
+                }
+            });
+        }
+    }
+
+    function loginOut() {
+        var token = $.cookie("token");
+        if (token) {
+            $.ajax({
+                url: 'http://localhost:8484/members/loginOut',
+                type: 'get',
+                data: {},
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader("token", token);
+                },
+                success: function (result) {
+                    if (result.code == 200) {
+                        $.removeCookie("token");
+                        window.location.href = "index2.html";
+                    }
+                },
+                error: function (result) {
+
+                }
+            });
+        }
+    }
+
+    function initProduct() {
+        $.ajax({
+            url: "http://localhost:8484/products",
+            type: "get",
+            data: {},
+            error: function () {
+                alert("失败!");
+            },
+            success: function (result) {
+                if (result.code == 200) {
+                    var productTextArea = $("#productText").val();
+                    var productArr = result.data;
+                    console.log(productArr);
+                    for (let product of productArr) {
+                        var dd = productTextArea.replace(/###productName###/g, product.productName).replace(/###price###/g, product.price)
+                            .replace(/###img###/g, product.productImg).replace(/##productId##/g, product.productId);
+                        $("#productDiv").append(dd);
+                    }
+                }
+            }
+        });
+    }
+
+    //购买商品到购物车
+    function buyProduct(id) {
+        var token = $.cookie("token");
+        if (token) {
+            $.ajax({
+                url: "http://localhost:8484/cart",
+                type: "post",
+                data: {"goodsId": id, "num": 1},
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader("token", token);
+                },
+                error: function () {
+                    alert("失败!");
+                },
+                success: function (result) {
+                    if (result.code == 200) {
+                        window.location.href = '/cart.html';
+                    }
+                }
+            });
+        } else {
+            alert("请先登录后，在购买商品");
+            window.location.href = '/memberLogin.html';
+        }
+    }
+</script>
+
+<script src="/js/jquery-3.3.1.js"></script>
+<script type="text/javascript" src="/js/shop/js/pages/index.js"></script>
+<script src="js/jquery.cookie.js"></script>
+<script>
+    $(function () {
+        initCategory();
+        cartSumNum();
+    });
+
+    //获取购物车商品的总数
+    function cartSumNum() {
+        var token = $.cookie("token");
+        if (token) {
+            $.ajax({
+                url: "http://localhost:8484/cart/queryCartSumNum",
+                type: "get",
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader("token", token);
+                },
+                error: function () {
+                    alert("失败!");
+                },
+                success: function (result) {
+                    if (result.code == 200) {
+                        $("#cartSumNum").html("(" + result.data + ")");
+                    }
+                }
+            });
+        }
+    }
+
+    var categoryData;
+    var html = "";
+
+    function initCategory() {
+        $.ajax({
+            url: "http://localhost:8484/category/queryCategoryList",
+            type: "get",
+            data: {},
+            dataType: "json",
+            error: function () {
+                alert("失败!");
+            },
+            success: function (result) {
+                if (result.code == 200) {
+                    categoryData = result.data;
+                    categoryIf1(0);
+                    $("#classifyListDiv").html(html);
+                    initCss();
+                }
+            }
+        });
+
+    }
+
+    function categoryIf1(id) {
+        var data = getChild(id);
+        for (var i = 0; i < data.length; i++) {
+            html += '<div class="item"><h3><a href="">' + data[i].name + '</a></h3>'
+            html += '<div class="item-list clearfix"><div class="subitem">'
+            categoryIf2(data[i].id);
+            html += '</div></div></div>'
+
+        }
+    }
+
+    function categoryIf2(id) {
+        var data = getChild(id);
+        for (var i = 0; i < data.length; i++) {
+            html += '<dl class="fore' + (i + 1) + '">';
+            html += '<dt style="width: 80px"><a href="" >' + data[i].name + '</a></dt>';
+            html += '<dd>';
+            categoryIf3(data[i].id);
+            html += '</dd>';
+            html += '</dl>';
+        }
+    }
+
+    function categoryIf3(id) {
+        var data = getChild(id);
+        for (var i = 0; i < data.length; i++) {
+            html += '<em><a href="">' + data[i].name + '</a>'
+            html += '</a></em>'
+        }
+    }
+
+    function getChild(id) {
+        var childData = [];
+        for (let category of categoryData) {
+            if (category.pid == id) {
+                childData.push(category);
+            }
+        }
+        return childData;
+    }
+
+    function initCss() {
+        $('.all-sort-list2 > .item').hover(function () {
+            //父类分类列表容器的高度
+
+            $(this).addClass('hover');
+            $(this).children('.item-list').css('display', 'block');
+        }, function () {
+            $(this).removeClass('hover');
+            $(this).children('.item-list').css('display', 'none');
+        });
+
+        $('.item > .item-list > .close').click(function () {
+            $(this).parent().parent().removeClass('hover');
+            $(this).parent().hide();
+        });
+    }
+
+    //修改密码
+    function updatePassword() {
+        bootbox.confirm({
+            title: "修改密码信息",   //显示标题的信息
+            size: "large",			//设置大小
+            message: $("#updatePasswordDiv form"),  //用于显示表格信息
+            buttons: {                //点击的是确认按钮 还是 取消按钮
+                confirm: {
+                    label: "确认",
+                    className: "btn btn-success"
+                },
+                cancel: {
+                    label: "取消",
+                    className: "btn btn-danger"
+                }
+            },
+            callback: function (result) {     //结果=ture 走ajax 并映射对应的贴加方法
+                var token = $.cookie("token");
+                var param = {};
+                var memberName = $("#memberName").val();
+                var password = $("#password").val();
+                var newPassword = $("#newPassword").val();
+                var confirmPassword = $("#confirmPassword").val();
+                param.memberName = memberName;
+                param.password = password;
+                param.newPassword = newPassword;
+                param.confirmPassword = confirmPassword;
+                $.ajax({
+                    url: "http://localhost:8484/members/updateUserPassword",
+                    type: "post",
+                    data: param,
+                    beforeSend: function (xht) {
+                        xht.setRequestHeader("token", token)
+                    },
+                    success: function (result) {
+                        if (result.code == 200) {
+                            alert("密码修改成功");
+                            $.removeCookie("token");
+                            window.location.href = "/index2.html"
+                        } else {
+                            alert(result.msg);
+                        }
+                    }
+                });
+                $("#updatePasswordDiv").html(updatePasswordHtml);
+            }
+        });
+    }
+</script>
+
+
+</body>
+</html>

@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8" xmlns:th="http://www.thymeleaf.org">
+    <title>Title</title>
+    <link href="../bootstrap/css/bootstrap.min.css" rel="stylesheet"/>
+    <link href="../bootstrap/css/bootstrap.dropdown.hack.css" rel="stylesheet"/>
+
+    <script src="../bootstrap/js/jquery-3.3.1.min.js"></script>
+    <script src="js/jquery.cookie.js"></script>
+    <script src="../bootstrap/js/bootstrap.min.js"></script>
+
+    <!-- 引入boobox弹框插件的css文件和js文件 -->
+    <script src="../bootstrap/js/bootbox.min.js"></script>
+    <script src="../bootstrap/js/bootbox.locales.min.js"></script>
+
+    <!-- 引入datatables表格插件的css文件和js文件 -->
+    <link href="../js/DataTables/css/dataTables.bootstrap.min.css" rel="stylesheet"/>
+    <script src="../js/DataTables/js/jquery.dataTables.min.js"></script>
+    <script src="../js/DataTables/js/dataTables.bootstrap.min.js"></script>
+
+    <!-- 引入datetimepicker日期插件的css文件和js文件 -->
+    <link href="../js/bootstrap-datetimepicker/css/bootstrap-datetimepicker.min.css" rel="stylesheet"/>
+    <script src="../js/bootstrap-datetimepicker/js/bootstrap-datetimepicker.min.js"></script>
+    <script type="text/javascript" src="../js/bootstrap-datetimepicker/js/locales/bootstrap-datetimepicker.zh-CN.js"></script>
+
+    <script src="/js/jsencrypt.min.js"></script>
+    <script src="/js/key.js"></script>
+</head>
+<body>
+<div class="panel panel-primary">
+    <div class="panel-heading">
+        用户登录
+    </div>
+    <div class="panel-body">
+        <form id="" class="form-horizontal" style="">
+
+            <div class="form-group">
+                <label class="col-sm-2 control-label">会员名</label>
+                <div class="col-sm-6">
+                    <input type="text" class="form-control" id="memberName"/>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="col-sm-2 control-label">密码</label>
+                <div class="col-sm-6">
+                    <input type="password" class="form-control" id="password"/>
+                </div>
+            </div>
+
+
+            <div class="form-group">
+                <label class="col-sm-2 control-label"></label>
+                <div style="padding-left:120px">
+                    <button type="button" onclick="memberLogin()" class="btn btn-primary">
+                        <span class="glyphicon glyphicon-ok"></span> 登录
+                    </button>
+                    &nbsp;
+                    <button type="reset" class="btn btn-danger">
+                        <span class="glyphicon glyphicon-refresh"></span> 重置
+                    </button>
+                    <button type="reset" class="btn btn-warning">
+                        <a href="../forget-password.jsp">修改密码</a>
+                    </button>
+                    <button type="reset" class="btn btn-warning">
+                        <a href="/user/toZhuCe">注册用户</a>
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+</body>
+</html>
+<script>
+
+
+    function memberLogin() {
+        var memberName = $("#memberName").val();
+        var password = $("#password").val();
+        if (memberName.trim() == "") {
+            bootbox.alert("会员名不能为空");
+        } else if (password.trim() == "") {
+            bootbox.alert("密码不能为空");
+        } else {
+            var param = {};
+
+            var encrypt=new JSEncrypt();
+            encrypt.setPublicKey(publicKey)
+            memberName= encrypt.encrypt(memberName);
+            password=  encrypt.encrypt(password);
+            param.memberName = memberName;
+            param.password = password;
+            $.ajax({
+                url: "http://localhost:8484/members/login",
+                type: "post",
+                data: param,
+                dataType: "json",
+                error: function () {
+                    alert("失败!");
+                },
+                success: function (result) {
+                    if (result.code == 200) {
+                        var token = result.data;
+                        $.cookie("token", token);
+                        window.location.href = "/index2.html";
+                    } else {
+                        alert(result.msg);
+                    }
+                }
+
+            });
+        }
+    }
+</script>

@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
+
+    <link rel="icon" href="/js/shop/assets/img/favicon.ico">
+    <link rel="stylesheet" type="text/css" href="/js/shop/css/webbase.css"/>
+    <link rel="stylesheet" type="text/css" href="/js/shop/css/pages-JD-index.css"/>
+    <link rel="stylesheet" type="text/css" href="/js/shop/css/widget-jquery.autocomplete.css"/>
+    <link rel="stylesheet" type="text/css" href="/js/shop/css/widget-cartPanelView.css"/>
+    <title>商城首页</title>
+</head>
+<body>
+
+<div id="nav-bottom">
+    <!--顶部-->
+    <div class="nav-top">
+        <!--头部-->
+        <div class="header">
+            <div class="py-container">
+                <div class="yui3-g NavList">
+                    <div class="yui3-u Left all-sort">
+                        <h4>全部商品分类</h4>
+                    </div>
+                    <div class="yui3-u Center navArea">
+                        <ul class="nav">
+                            <li class="f-item">服装城</li>
+                            <li class="f-item">美妆馆</li>
+                            <li class="f-item">品优超市</li>
+                            <li class="f-item">全球购</li>
+                            <li class="f-item">闪购</li>
+                            <li class="f-item">团购</li>
+                            <li class="f-item">有趣</li>
+                        </ul>
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--列表-->
+<div class="sort">
+    <div class="py-container">
+        <div class="yui3-g SortList ">
+            <div class="yui3-u Left all-sort-list">
+                <div class="all-sort-list2" id="classifyListDiv">
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script src="/js/jquery-3.3.1.js"></script>
+<script type="text/javascript" src="/js/shop/js/pages/index.js"></script>
+<script>
+    $(function () {
+        initCategory();
+    });
+
+    var categoryData;
+    var html = "";
+
+    function initCategory() {
+        $.ajax({
+            url: "http://localhost:8484/category/queryCategoryList",
+            type: "get",
+            data: {},
+            dataType: "json",
+            error: function () {
+                alert("失败!");
+            },
+            success: function (result) {
+                if (result.code == 200) {
+                    categoryData = result.data;
+                    bulid1(0);
+                    $("#classifyListDiv").html(html);
+                    initCss();
+                }
+
+            }
+        });
+    }
+
+    function bulid1(id) {
+        var cateArr = getChilds(id);
+        for (let cate of cateArr) {
+            html += ' <div class="item">\n' +
+                '                        <h3><a href="">' + cate.name + '</a></h3>\n' +
+                '                        <div class="item-list clearfix">\n' +
+                '                            <div class="subitem">'
+            bulid2(cate.id);
+            html += '</div></div></div>'
+        }
+    }
+
+    function bulid2(id) {
+        var cateArr = getChilds(id);
+        for (let cate of cateArr) {
+            html += '<dl class="fore1">\n' +
+                '                                    <dt><a href="">' + cate.name + '</a></dt>';
+            bulid3(cate.id);
+            html += '</dl>'
+        }
+    }
+
+    function bulid3(id) {
+        var cateArr = getChilds(id);
+        html += '<dd>'
+        for (let cate of cateArr) {
+            html += '<em><a href="">' + cate.name + '</a></em>'
+        }
+        html += '</dd>';
+    }
+
+    function getChilds(id) {
+        var childArr = [];
+        for (let cate of categoryData) {
+            if (cate.pid == id) {
+                childArr.push(cate);
+            }
+        }
+        return childArr;
+    }
+
+    function initCss() {
+        $('.all-sort-list2 > .item').hover(function () {
+            //父类分类列表容器的高度
+
+            $(this).addClass('hover');
+            $(this).children('.item-list').css('display', 'block');
+        }, function () {
+            $(this).removeClass('hover');
+            $(this).children('.item-list').css('display', 'none');
+        });
+
+        $('.item > .item-list > .close').click(function () {
+            $(this).parent().parent().removeClass('hover');
+            $(this).parent().hide();
+        });
+    }
+
+
+    /*function categoryIf1(id) {
+        var data=getChild(id);
+        for(var i=0;i<data.length;i++){
+            html+='<div class="item"><h3><a href="">'+data[i].name+'</a></h3>'
+            html+='<div class="item-list clearfix"><div class="subitem">'
+            categoryIf2(data[i].id);
+            html+='</div></div></div>'
+
+        }
+    }
+    function categoryIf2(id) {
+        var data=getChild(id);
+        for(var i=0;i<data.length;i++){
+            html += '<dl class="fore'+(i+1)+'">';
+            html += '<dt><a href="">'+data[i].name+'</a></dt>';
+            html += '<dd>';
+            categoryIf3(data[i].id);
+            html += '</dd>';
+            html += '</dl>';
+        }
+    }
+    function categoryIf3(id) {
+        var data=getChild(id);
+        for(var i=0;i<data.length;i++){
+            html+='<em><a href="">'+data[i].name+'</a>'
+            html+='</a></em>'
+        }
+    }
+
+    function getChild(id) {
+        var childData=[];
+        for(let category of categoryData){
+            if(category.pid ==id){
+                childData.push(category);
+            }
+        }
+        return childData;
+    }*/
+</script>
+
+
+</body>
+</html>

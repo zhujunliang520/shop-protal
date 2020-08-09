@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link href="../bootstrap/css/bootstrap.min.css" rel="stylesheet"/>
+    <link href="../bootstrap/css/bootstrap.dropdown.hack.css" rel="stylesheet"/>
+
+    <script src="../bootstrap/js/jquery-3.3.1.min.js"></script>
+    <script src="../bootstrap/js/bootstrap.min.js"></script>
+
+    <!-- 引入boobox弹框插件的css文件和js文件 -->
+    <script src="../bootstrap/js/bootbox.min.js"></script>
+    <script src="../bootstrap/js/bootbox.locales.min.js"></script>
+
+    <!-- 引入datatables表格插件的css文件和js文件 -->
+    <link href="../js/DataTables/css/dataTables.bootstrap.min.css" rel="stylesheet"/>
+    <script src="../js/DataTables/js/jquery.dataTables.min.js"></script>
+    <script src="../js/DataTables/js/dataTables.bootstrap.min.js"></script>
+
+    <!-- 引入datetimepicker日期插件的css文件和js文件 -->
+    <link href="../js/bootstrap-datetimepicker/css/bootstrap-datetimepicker.min.css" rel="stylesheet"/>
+    <script src="../js/bootstrap-datetimepicker/js/bootstrap-datetimepicker.min.js"></script>
+    <script type="text/javascript"
+            src="../js/bootstrap-datetimepicker/js/locales/bootstrap-datetimepicker.zh-CN.js"></script>
+</head>
+<body>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-primary">
+                <div class="panel-heading">商品展示列表</div>
+                <div class="panel-body" id="productDiv">
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+
+    </div>
+</div>
+
+<textarea id="productText" style="display: none">
+                     <div class="col-md-4">
+                                <div class="thumbnail" style="width: 600px;height: 300px">
+                                    <img src="###img###" alt="..." style="width: 80px">
+                                    <div class="caption">
+                                        <h3>###productName###</h3>
+                                        <p>###price###</p>
+                                        <p>
+                                            <a href="#" class="btn btn-primary" role="button">增加</a>
+                                            <a href="#" class="btn btn-default" role="button">修改</a>
+                                        </p>
+                                    </div>
+                                </div>
+                     </div>
+</textarea>
+<script>
+    $(function () {
+        initProduct();
+    });
+
+    function initProduct() {
+        $.ajax({
+            url: "http://localhost:8484/products",
+            type: "get",
+            data: {},
+            dataType: "json",
+            error: function () {
+                alert("失败!");
+            },
+            success: function (result) {
+                if (result.code == 200) {
+                    var productTextArea = $("#productText").val();
+                    var productArr = result.data;
+                    console.log(productArr);
+                    for (let product of productArr) {
+                        var dd = productTextArea.replace(/###productName###/g, product.productName).replace(/###price###/g, product.price).replace(/###img###/g, product.productImg);
+                        $("#productDiv").append(dd);
+                    }
+                }
+            }
+        });
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link href="../bootstrap/css/bootstrap.min.css" rel="stylesheet"/>
+    <link href="../bootstrap/css/bootstrap.dropdown.hack.css" rel="stylesheet"/>
+
+    <script src="../bootstrap/js/jquery-3.3.1.min.js"></script>
+    <script src="../bootstrap/js/bootstrap.min.js"></script>
+
+    <!-- 引入boobox弹框插件的css文件和js文件 -->
+    <script src="../bootstrap/js/bootbox.min.js"></script>
+    <script src="../bootstrap/js/bootbox.locales.min.js"></script>
+
+    <!-- 引入datatables表格插件的css文件和js文件 -->
+    <link href="../js/DataTables/css/dataTables.bootstrap.min.css" rel="stylesheet"/>
+    <script src="../js/DataTables/js/jquery.dataTables.min.js"></script>
+    <script src="../js/DataTables/js/dataTables.bootstrap.min.js"></script>
+
+    <!-- 引入datetimepicker日期插件的css文件和js文件 -->
+    <link href="../js/bootstrap-datetimepicker/css/bootstrap-datetimepicker.min.css" rel="stylesheet"/>
+    <script src="../js/bootstrap-datetimepicker/js/bootstrap-datetimepicker.min.js"></script>
+    <script type="text/javascript"
+            src="../js/bootstrap-datetimepicker/js/locales/bootstrap-datetimepicker.zh-CN.js"></script>
+
+    <script>
+
+
+        var chineseLanguage = {
+            "sProcessing": "处理中...",
+            "sLengthMenu": "显示 _MENU_ 项结果",
+            "sZeroRecords": "没有匹配结果",
+            "sInfo": "显示第 _START_ 至 _END_ 项结果，共 _TOTAL_ 项",
+            "sInfoEmpty": "显示第 0 至 0 项结果，共 0 项",
+            "sInfoFiltered": "(由 _MAX_ 项结果过滤)",
+            "sInfoPostFix": "",
+            "sSearch": "搜索:",
+            "sUrl": "",
+            "sEmptyTable": "表中数据为空",
+            "sLoadingRecords": "载入中...",
+            "sInfoThousands": ",",
+            "oPaginate": {
+                "sFirst": "首页",
+                "sPrevious": "上页",
+                "sNext": "下页",
+                "sLast": "末页"
+            },
+            "oAria": {
+                "sSortAscending": ": 以升序排列此列",
+                "sSortDescending": ": 以降序排列此列"
+            }
+        };
+
+        var bookTable;
+
+        function search() {
+            bookTable.ajax.reload();
+        }
+
+        <!--初始化-->
+        $(function () {
+            initmemberTable();
+            // 	addPhoneDigalHtml=$("#addUserDiv").html(); //获取div元素赋值给全局变量
+            updatePhoneDigalHtml = $("#updateBookDiv").html();
+            /*  initDatetimpicker("#minBirthday", 1)
+            initDatetimpicker("#maxBirthday", 1)*/
+            /* initDatetimpicker("#minCreateDate", 2)
+             initDatetimpicker("#maxCreateDate", 2)*/
+        });
+
+        function initDatetimpicker(id, type) {
+            var format = type == 2 ? "yyyy-mm-dd" : "yyyy-mm-dd hh:mm:ss";
+            $(id).datetimepicker({
+                format: 'yyyy-mm-dd',
+                //选择语言
+                language: "zh-CN",
+                //自动关闭
+                autoclose: true
+            });
+        }
+
+        <!--分页和精确查询-->
+        function initmemberTable() {
+            bookTable = $("#bookTable").DataTable({
+                serverSide: true,//开启服务端模式，想要从后台获取数据，必须要把这个属性的值设为true
+                processing: true,//是否显示正在处理中状态
+                language: chineseLanguage,
+                searching: false,//是否显示搜索框
+                ordering: false,//是否开启排序
+                lengthMenu: [5, 10, 15],//设置每页显示条数下拉框中值
+                ajax: {
+                    url: "http://192.168.40.129:8080/books/queryBookPage",
+                    type: "get",
+                    data: function (param) {
+                        param.bookName = $("#queryForm #bName").val();
+                        param.minPrice = $("#queryForm #minPrice").val();
+                        param.maxPrice = $("#queryForm #maxPrice").val();
+                        param.typeId = $("#queryForm #bookType").val();
+                        param.minDate = $("#queryForm #minCreateDate").val()
+                        param.maxDate = $("#queryForm #maxCreateDate").val();
+                    }
+                },
+                columns: [
+                    {
+
+                        data: "bookId",
+
+                        render: function (data) {  //data相当于封装类的属性return 希望返回什么
+                            return "<input type='checkbox' name='id' value='" + data + "' />";
+                        }
+                    },
+                    {data: "bookName"},
+
+                    {data: "bookPrice"},
+                    {data: "typeName"},
+                    {
+                        data: "bookDate",
+                        render: function (data) {
+                            return data;
+                        }
+
+                    },
+                    {
+                        data: "bookId",
+                        //data= roleId,row 一行数据相当于一个role对象
+                        render: function (data, type, member) {
+                            var buttonHTML = "";
+                            buttonHTML += '<div class="btn-group btn-group-xs">';
+                            buttonHTML += '<button type="button" onclick="showUpdateRoleDiv(' + data + ')" class="btn btn-primary">';
+                            buttonHTML += '<span class="glyphicon glyphicon-pencil"></span>&nbsp;修改';
+                            buttonHTML += '</button>';
+
+                            buttonHTML += '<button type="button" onclick="deleteRole(' + data + ')" class="btn btn-danger">';
+                            buttonHTML += '<span class="glyphicon glyphicon-trash"></span>&nbsp;删除';
+                            buttonHTML += '</button>';
+                            return buttonHTML;
+                        }
+                    }
+                ]
+            });
+        }
+
+    </script>
+</head>
+<body>
+
+<div class="panel panel-primary">
+    <div class="panel-heading">
+        条件查询
+    </div>
+    <div class="panel-body">
+        <form id="queryForm" class="form-horizontal">
+            <div class="container">
+                <!-- 一行 -->
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">书名:</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" id="bName" placeholder="请输入会员名">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">价格:</label>
+                            <div class="col-sm-10">
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="minPrice">
+                                    <span class="input-group-addon">--</span>
+                                    <input type="text" class="form-control" id="maxPrice">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- 一行 -->
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">日期:</label>
+                            <div class="col-sm-10">
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="minCreateDate">
+                                    <span class="input-group-addon">--</span>
+                                    <input type="text" class="form-control" id="maxCreateDate">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <label class="col-sm-2 control-label">书的类型：</label>
+                        <div class="form-group" id="areaDiv">
+                            <div class="col-md-3" style="width: 200px">
+                                <select class="form-control" id="bookType">
+                                    <option value="-1">请选择</option>
+
+                                </select>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="row">
+                    <div style="padding-left:120px">
+                        <button type="button" onclick="search()" class="btn btn-primary">
+                            <span class="glyphicon glyphicon-search"></span>查询
+                        </button>
+                        &nbsp;
+                        <button type="reset" class="btn btn-danger">
+                            <span class="glyphicon glyphicon-refresh"></span>重置
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+<div class="panel panel-primary">
+    <div class="panel-heading">图书展示列表</div>
+    <div class="panel-body">
+        <div style="margin-bottom:10px">
+            <button type="button" onclick="showAddUserDiv()" class="btn btn-primary">
+                <span class="glyphicon glyphicon-plus"></span>新增
+            </button>
+            <button type="button" onclick="batchDelete()" class="btn btn-danger">
+                <span class="glyphicon glyphicon-minus"></span>批量删除
+            </button>
+
+
+        </div>
+        <table id="bookTable" class="table table-striped table-bordered">
+            <thead>
+            <tr>
+                <th>
+                    <input onclick="checkAll()" id="checkAll" type="checkbox"/>
+                </th>
+                <th>图书名</th>
+                <th>图书价格</th>
+                <th>图书类型</th>
+                <th>日期</th>
+                <th>操作</th>
+            </tr>
+            </thead>
+        </table>
+    </div>
+</div>
+
+<!-- 修改新增表单模板 -->
+<div id="updateBookDiv" style="display: none">
+
+    <form id="updateBookForm" class="form-horizontal" style="">
+
+        <input type="hidden" id="bookId">
+        <div class="form-group">
+            <label class="col-sm-2 control-label">图书名</label>
+            <div class="col-sm-8">
+                <input type="text" class="form-control" id="bookName"/>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="col-sm-2 control-label">图书价格</label>
+            <div class="col-sm-8">
+                <input type="text" class="form-control" id="bookPrice"/>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="col-sm-2 control-label">日期</label>
+            <div class="col-sm-8">
+                <input type="text" class="form-control" id="bookDate"/>
+            </div>
+        </div>
+
+
+        <!-- select选择框相关 -->
+        <div class="form-group">
+            <label class="col-sm-2 control-label">类型：</label>
+            <div class="col-md-6">
+                <select class="form-control" id="selectType">
+                    <option value="-1">请选择</option>
+
+                </select>
+            </div>
+        </div>
+
+    </form>
+</div>
+
+</body>
+</html>
+
+<script>
+    function showAddUserDiv() {
+        window.location.href = "addBook.html"
+    }
+
+    function showUpdateRoleDiv(id) {
+
+        $.ajax({
+            url: "http://192.168.40.129:8080/books/getBookById",
+            type: "get",
+            data: {"bookId": id},
+            dataType: "json",
+            error: function () {
+                alert("失败!");
+            },
+            success: function (result) {
+                if (result.code == 200) {
+
+                    var re = result.data;
+                    $("#updateBookForm #bookId").val(re.bookId);
+                    $("#updateBookForm #bookName").val(re.bookName);
+                    $("#updateBookForm #bookPrice").val(re.bookPrice);
+                    $("#updateBookForm #bookDate").val(re.bookDate);
+                    $("#updateBookForm #selectType").val(re.typeId);
+                    bootbox.confirm({
+                        title: "修改用户信息",
+                        size: "large",
+                        message: $("#updateBookDiv form"),
+                        buttons: {
+                            confirm: {
+                                label: "确认",
+                                className: "btn btn-success"
+                            },
+                            cancel: {
+                                label: "取消",
+                                className: "btn btn-danger"
+                            }
+                        },
+                        callback: function (result) {
+                            if (result) {
+                                //获取修改后的表单信息
+                                var param = {};
+                                param.bookId = $("#updateBookForm #bookId").val();
+                                param.bookName = $("#updateBookForm #bookName").val();
+                                param.bookPrice = $("#updateBookForm #bookPrice").val();
+                                param.bookDate = $("#updateBookForm #bookDate").val();
+                                param.typeId = $("#updateBookForm #selectType").val();
+                                if (result) {
+                                    //发起ajax修改用户
+                                    $.ajax({
+                                        url: "http://localhost:8080/books",
+                                        type: "put",
+                                        data: param,
+                                        dataType: "json",
+                                        error: function () {
+                                            alert("失败!");
+                                        },
+                                        success: function (data) {
+                                            if (data.code == 200) {
+                                                //刷新dataTables数据
+                                                bookTable.ajax.reload()
+                                            }
+                                        }
+
+                                    });
+                                }
+
+                            }
+                            $("#updateBookDiv").html(updatePhoneDigalHtml);
+                        }
+                    });
+
+                }
+
+
+            }
+
+        });
+    }
+
+    $(function () {
+        initType();
+    })
+
+    function initType() {
+        $.ajax({
+            url: "http://192.168.40.129:8080/books/bookType",
+            type: "get",
+            data: {},
+            dataType: "json",
+            error: function () {
+                alert("失败!");
+            },
+            success: function (result) {
+                if (result.code == 200) {
+                    var typeArr = result.data;
+                    for (var i = 0; i < typeArr.length; i++) {
+                        $("#selectType").append("<option value='" + typeArr[i].typeId + "'>" + typeArr[i].typeName + "</option>");
+                        $("#bookType").append("<option value='" + typeArr[i].typeId + "'>" + typeArr[i].typeName + "</option>");
+                    }
+                }
+            }
+        });
+    }
+
+    function deleteRole(id) {
+        bootbox.confirm({
+            title: "删除用户信息",
+            size: "large",
+            message: "你确定要删除吗?",
+            buttons: {
+                confirm: {
+                    label: "确认",
+                    className: "btn btn-success"
+                },
+                cancel: {
+                    label: "取消",
+                    className: "btn btn-danger"
+                }
+            },
+            callback: function (result) {
+                if (result) {
+                    $.ajax({
+                        url: "http://localhost:8080/books",
+                        type: "delete",
+                        data: {bookId: id},
+                        dataType: "json",
+                        error: function () {
+                            alert("失败!");
+                        },
+                        success: function (result) {
+                            if (result.code == 200) {
+                                search();
+                            }
+                        }
+                    });
+                }
+            }
+        });
+    }
+</script>
